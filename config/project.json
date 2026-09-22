@@ -23,7 +23,8 @@
       "**/*.log",
       "**/*.bbl",
       "**/*.blg",
-      "**/.gitkeep"
+      "**/.gitkeep",
+      "**/.atomic-*.stage"
     ],
     "max_document_bytes": 20971520,
     "max_document_chars": 250000,

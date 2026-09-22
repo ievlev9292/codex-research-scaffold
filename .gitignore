@@ -13,3 +13,5 @@ __pycache__/
 /catalog/search.sqlite*
 /catalog/extracted/*
 !/catalog/extracted/.gitkeep
+# Interrupted atomic-save recovery files
+**/.atomic-*.stage

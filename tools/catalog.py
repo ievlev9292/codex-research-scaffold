@@ -134,7 +134,7 @@ def inventory(root):
         if not directory.exists():
             continue
         for path in sorted(directory.rglob("*")):
-            if not path.is_file() or path.is_symlink():
+            if not path.is_file() or path.is_symlink() or (path.name.startswith(".atomic-") and path.name.endswith(".stage")):
                 continue
             rel = path.relative_to(root).as_posix()
             if any(fnmatch.fnmatch(rel, pattern) for pattern in cfg["exclude"]):
@@ -533,6 +533,7 @@ def main(argv=None):
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
 
 
 

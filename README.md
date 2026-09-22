@@ -1,4 +1,4 @@
-# Portable research scaffold v2
+# Portable research scaffold v2 — revision 2
 
 Requires Python 3.10+ with SQLite FTS5; PDF text extraction additionally needs pypdf. Scientific backends and report tools are checked at initialization, not bundled. Windows, macOS and Linux use the same Python helpers; select the actual executables on each host. Keep the copy path reasonably short on Windows systems with legacy path limits.
 
@@ -30,3 +30,6 @@ After moving an initialized project, run initialization again to rebind local to
 The bare copy contains no live host profile, database, research results or configured Wolfram packages. Optional calculation/input/tests/shared folders are created when useful. Search caches are rebuildable; manifests and scientific records preserve evidence.
 
 Say “close the run” when ready. Every five closed research runs, the agent suggests a small documentation audit. Running or declining that audit leaves other authorized work unaffected.
+
+Atomic saves use unique .atomic-*.stage sibling files so staging inherits the destination directory permissions. This narrowly scoped internal save mechanism is an exception to research scratch under tmp/. Successful saves leave no staging files or directories; failed/interrupted saves retain stages for recovery. Catalogue and Git exclude these files. Existing Windows DACLs and POSIX mode bits are preserved; other filesystem security metadata is not promised. Previously damaged ACLs need separately authorized repair. Replacement does not serialize read-modify-write transactions, concurrent permission edits, or guarantee power-loss durability.
+

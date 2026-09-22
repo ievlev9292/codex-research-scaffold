@@ -12,7 +12,7 @@ Read PROJECT_HANDOFF.md and the active RUN.md to resume. Read linked evidence on
 - Detailed evidence lives with its calculation or derivation. Runs record scope, decisions, coverage and evidence links. Shared conventions live in research/notes; project controls remain short.
 - A completed calculation or report does not close a run. Close only when the user asks. Suggestions about maintenance do not interrupt authorized research.
 - Research-created .md, .tex, .pdf and .nb names begin YYYYMMDD_HHMM. Fixed controls, shipped instructions/templates and supplied originals retain their names; .py/.wl are exempt. Add a suffix on collision.
-- Keep scratch work in a unique tmp/ subfolder; preserve it during the task. Do not automatically delete, stage/commit files, or modify other projects.
+- Keep research scratch work in a unique tmp/ subfolder; the atomic-save helper alone uses reserved .atomic-*.stage siblings for correct filesystem permissions (retain failed stages); preserve it during the task. Do not automatically delete, stage/commit files, or modify other projects.
 
 ## Load when needed
 
@@ -27,3 +27,4 @@ Read PROJECT_HANDOFF.md and the active RUN.md to resume. Read linked evidence on
 | Python / Wolfram calculation | Relevant project skill in .agents/skills/ |
 
 The bundled de-ai-polish-writing skill is explicit-only. Use available ARS/TikZ or other skills when relevant; do not assume they are installed. Scientific checks and artifact verification do not authorize opening UI panels.
+
