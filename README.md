@@ -36,7 +36,7 @@ The remaining folders support the agent's instructions, tool settings and local 
 - OpenAI Codex.
 - Python 3.10 or later with SQLite FTS5 support. PDF text extraction also needs `pypdf`.
 - Scientific packages and tools appropriate to your work, such as Python libraries or Mathematica.
-- For the default report workflow: LaTeX, the ARS research skill and an independent reviewing agent. TikZ diagrams use the `tikz-diagrams` skill.
+- For reports: a LaTeX installation and the [ARS research skill](https://github.com/Imbad0202/academic-research-skills-codex). Reports with TikZ diagrams also need the [tikz-diagrams skill](https://github.com/Patrick-Healy/tikz-diagrams-skill). You can ask your Codex to install these skills for you.
 
 These dependencies are not bundled. Initialization checks what is available and recommends any setup or updates; installation and updates require your permission.
 
