@@ -1,0 +1,2 @@
+# Preserve the released files' exact bytes across operating systems.
+* -text

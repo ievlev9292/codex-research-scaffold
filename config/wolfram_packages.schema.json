@@ -1,0 +1,228 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Portable Wolfram package registry",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "packages"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "packages": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/package"
+      }
+    }
+  },
+  "$defs": {
+    "strings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true,
+      "description": "Project-relative script/text evidence paths; no notebook content processing."
+    },
+    "package": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "source",
+        "version",
+        "entry_points",
+        "dependencies",
+        "environments",
+        "installation",
+        "validation",
+        "authorization",
+        "capabilities",
+        "limitations"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9._-]*$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "type": "object",
+          "required": [
+            "url"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "url": {
+              "type": "string",
+              "pattern": "^https?://"
+            },
+            "revision": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "entry_points": {
+          "$ref": "#/$defs/strings"
+        },
+        "dependencies": {
+          "$ref": "#/$defs/strings"
+        },
+        "environments": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          }
+        },
+        "installation": {
+          "type": "object",
+          "required": [
+            "status",
+            "evidence"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "status": {
+              "enum": [
+                "unknown",
+                "absent",
+                "present"
+              ]
+            },
+            "binding_key": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "host_fingerprint": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/evidence"
+            }
+          }
+        },
+        "validation": {
+          "type": "object",
+          "required": [
+            "status",
+            "evidence"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "status": {
+              "enum": [
+                "not_performed",
+                "passed",
+                "failed",
+                "inconclusive"
+              ]
+            },
+            "host_fingerprint": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "environment": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "version": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "checked_at": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "basis": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "evidence": {
+              "$ref": "#/$defs/evidence"
+            },
+            "binding_identity": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^[0-9a-f]{64}$",
+              "description": "Identity reported for the exact selected local binding when the recorded validation was performed."
+            }
+          }
+        },
+        "authorization": {
+          "type": "object",
+          "required": [
+            "status",
+            "scope",
+            "evidence"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "status": {
+              "enum": [
+                "unrequested",
+                "authorized",
+                "denied"
+              ]
+            },
+            "scope": {
+              "$ref": "#/$defs/strings"
+            },
+            "evidence": {
+              "$ref": "#/$defs/evidence"
+            }
+          }
+        },
+        "capabilities": {
+          "$ref": "#/$defs/strings"
+        },
+        "limitations": {
+          "$ref": "#/$defs/strings"
+        }
+      }
+    }
+  }
+}

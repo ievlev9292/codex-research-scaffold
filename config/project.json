@@ -1,0 +1,54 @@
+{
+  "schema_version": 2,
+  "project": {
+    "title": null,
+    "question": null
+  },
+  "indexing": {
+    "roots": [
+      "sources",
+      "research",
+      "reports_tex",
+      "calculations",
+      "data"
+    ],
+    "exclude": [
+      "**/tmp/**",
+      "**/__pycache__/**",
+      "**/.git/**",
+      "**/stdout*",
+      "**/stderr*",
+      "**/code_snapshot*",
+      "**/*.aux",
+      "**/*.log",
+      "**/*.bbl",
+      "**/*.blg",
+      "**/.gitkeep"
+    ],
+    "max_document_bytes": 20971520,
+    "max_document_chars": 250000,
+    "max_total_chars": 5000000,
+    "max_pdf_pages": 200,
+    "chunk_chars": 1800
+  },
+  "environment": {
+    "baseline_python_packages": [
+      "numpy",
+      "scipy",
+      "matplotlib",
+      "sympy",
+      "mpmath",
+      "pandas",
+      "psutil",
+      "threadpoolctl"
+    ],
+    "tools": {},
+    "skill_roots": [
+      ".agents/skills"
+    ],
+    "plugin_roots": []
+  },
+  "maintenance": {
+    "audit_every_closed_runs": 5
+  }
+}
