@@ -6,7 +6,7 @@ A starting folder for scientific research with OpenAI Codex. It keeps sources, c
 
 1. Copy this scaffold into a new project folder, including the hidden `.agents/` folder.
 2. Put your papers and reference material in `sources/human/`, and your input datasets in `data/raw/human/`.
-3. Open the project folder in Codex and ask: **"Initialize this research project using the supplied sources."**
+3. Open the project folder in Codex and start a chat. Codex initializes the project automatically before answering your first question. You can also explicitly ask it to initialize.
 4. Describe your research question, the result you want, and any limits on scope or computing resources.
 
 Initialization checks the available tools and supplied sources, identifies gaps, and prepares the project for work. You can adapt the [example prompts](sources/prompts/) if you want a more detailed starting request.
@@ -14,6 +14,8 @@ Initialization checks the available tools and supplied sources, identifies gaps,
 ## Working on a project
 
 Ask for research, calculations or a report in ordinary language. The agent records findings, runs relevant checks and keeps track of unresolved questions. Reports receive independent review and corrections before rendering and page inspection.
+
+Each new project chat starts a research run by default. Say “this is not a research run” at the opening to opt out, or ask to continue an existing run. Within a chat, another run starts only when you explicitly request it.
 
 Say **"Close the run"** when you want the current run closed. Its results and open questions are saved for future work. Every five closed runs, the agent suggests a small documentation audit.
 
@@ -36,7 +38,7 @@ The remaining folders support the agent's instructions, tool settings and local 
 - OpenAI Codex.
 - Python 3.10 or later with SQLite FTS5 support. PDF text extraction also needs `pypdf`.
 - Scientific packages and tools appropriate to your work, such as Python libraries or Mathematica.
-- For reports: a LaTeX installation and the [ARS research skill](https://github.com/Imbad0202/academic-research-skills-codex). Reports with TikZ diagrams also need the [tikz-diagrams skill](https://github.com/Patrick-Healy/tikz-diagrams-skill). You can ask your Codex to install these skills for you.
+- For reports: a LaTeX installation. The [ARS research skill](https://github.com/Imbad0202/academic-research-skills-codex) for report review and the [tikz-diagrams skill](https://github.com/Patrick-Healy/tikz-diagrams-skill) for diagrams are recommended but not required. During initialization, Codex checks whether you have these skills and offers to install any that are missing, with your permission.
 
 These dependencies are not bundled. Initialization checks what is available and recommends any setup or updates; installation and updates require your permission.
 

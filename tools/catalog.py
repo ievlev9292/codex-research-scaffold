@@ -12,6 +12,7 @@ import sqlite3
 import sys
 import uuid
 from common import write_text as atomic_text
+from arxiv import groups as arxiv_groups
 
 DEFAULTS = {
     "roots": ["sources", "research", "reports_tex", "calculations", "data"],
@@ -125,6 +126,7 @@ def select(records, identity):
 def inventory(root):
     cfg = settings(root)
     existing = all_records(root)
+    representations = arxiv_groups(root)
     by_path = {r["path"]: r for r in existing if r.get("path")}
     for r in existing:
         if r.get("path"):
@@ -153,6 +155,10 @@ def inventory(root):
                        "title": path.stem, "inspection": "not_recorded"}
                 existing.append(row)
                 by_path[rel] = row
+            row.pop('arxiv_representation', None)
+            if rel in representations:
+                row['arxiv_representation'] = representations[rel]
+                row['paper_version'] = representations[rel].get('paper_version')
             stat = path.stat()
             row.update(category=category, kind=kind(path, rel), size=stat.st_size, mtime_ns=stat.st_mtime_ns,
                        present=True, content_role="reference_data")
@@ -342,7 +348,10 @@ def index(root, extension=None, pages=None, allow_notebook=False):
             for row in records:
                 reason = None
                 is_target = row is target
-                if not row.get("present"):
+                representation = row.get('arxiv_representation')
+                if representation and (not representation.get('representation_valid') or representation.get('preferred_body') != row.get('path')):
+                    reason = 'Grouped arXiv representation; index only the hash-current preferred body: ' + str(representation.get('preferred_body'))
+                elif not row.get("present"):
                     reason = "Remote-only source or local file missing; discovery metadata only"
                 elif row["kind"] == "notebook" and not (is_target and allow_notebook):
                     reason = "Notebook contents require an explicit request for this exact file"

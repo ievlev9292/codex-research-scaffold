@@ -24,7 +24,8 @@
       "**/*.bbl",
       "**/*.blg",
       "**/.gitkeep",
-      "**/.atomic-*.stage"
+      "**/.atomic-*.stage",
+      "**/.lifecycle.lock"
     ],
     "max_document_bytes": 20971520,
     "max_document_chars": 250000,

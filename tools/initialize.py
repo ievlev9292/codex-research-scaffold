@@ -28,6 +28,91 @@ TOOLS = {
 CHECK_STATES = {"passed", "failed", "inconclusive", "not_performed"}
 
 
+
+REPORT_SKILLS = {
+    "ars": {"name": "academic-research-suite", "purpose": "independent report review",
+            "url": "https://github.com/Imbad0202/academic-research-skills-codex"},
+    "tikz": {"name": "tikz-diagrams", "purpose": "useful report diagrams",
+             "url": "https://github.com/Patrick-Healy/tikz-diagrams-skill"},
+}
+
+
+def skill_setup(root, profile, previous, discovery=None):
+    """Evaluate explicit host/runtime evidence; inventory alone never proves activation."""
+    discovery = discovery or {}
+    if not isinstance(discovery, dict):
+        raise ValueError("skill_discovery must be an object.")
+    observations = discovery.get("capabilities", {})
+    if not isinstance(observations, dict):
+        raise ValueError("skill_discovery.capabilities must be an object.")
+    checked = bool(discovery)
+    hashes = evidence(root, discovery.get("evidence")) if checked else {}
+    if type(discovery.get("complete", False)) is not bool:
+        raise ValueError("skill_discovery.complete must be boolean.")
+    records = {}
+    same_host = profile["host_fingerprint"] == previous.get("host_fingerprint")
+    for key, spec in REPORT_SKILLS.items():
+        observed = observations.get(key, {})
+        if not isinstance(observed, dict):
+            raise ValueError("Skill observations must be objects.")
+        for field in ("installed", "available"):
+            if field in observed and type(observed[field]) is not bool:
+                raise ValueError("installed/available observations must be booleans or omitted.")
+        copies = [x["local_sha256"] for x in profile["extensions"]
+                  if x["kind"] == "skill" and x["name"] == spec["name"]]
+        installed, available = observed.get("installed"), observed.get("available")
+        if installed is False and available is True:
+            raise ValueError("A missing skill cannot simultaneously be available.")
+        if available is True:
+            status = "available"
+        elif installed is True:
+            status = "installed_but_unavailable" if available is False else "activation_unknown"
+        elif installed is False or (discovery.get("complete") and not copies):
+            status = "missing"
+        else:
+            status = "unknown"
+        messages = {
+            "available": "Available for " + spec["purpose"] + ".",
+            "missing": "Offer to install " + spec["name"] + " for " + spec["purpose"] + "; ask for consent first.",
+            "installed_but_unavailable": "Restore activation/discovery of " + spec["name"] + "; do not install a duplicate.",
+            "activation_unknown": "Verify current-agent availability of " + spec["name"] + "; do not install a duplicate.",
+            "unknown": "Check host installation and current-agent availability of " + spec["name"] +
+                       "; if absent, offer installation for " + spec["purpose"] + " with consent.",
+        }
+        signature = digest({"status": status, "copies": sorted(copies), "spec": spec})
+        old = previous.get("skill_setup", {}).get(key, {})
+        decision = old.get("decision") if same_host and old.get("state_identity") == signature else None
+        if decision:
+            try:
+                if evidence(root, list(decision["evidence_hashes"])) != decision["evidence_hashes"]:
+                    decision = None
+            except (OSError, ValueError, KeyError):
+                decision = None
+        suppressed = bool(decision and decision["choice"] in {"declined", "deferred", "accepted"})
+        message = messages[status]
+        if suppressed:
+            message = "Previous setup choice: " + decision["choice"] + "; no repeated offer while state is unchanged."
+        records[key] = {**spec, "status": status, "state_identity": signature,
+                        "evidence_hashes": hashes, "decision": decision,
+                        "recommendation": message, "offer_suppressed": suppressed}
+    return records
+
+
+def record_setup(root, receipt_path):
+    path = inside(root, "config/host.local.json", must_exist=True)
+    profile = read_json(path)
+    if profile.get("host_fingerprint") != fingerprint() or profile.get("project_root") != str(root):
+        raise ValueError("Host/project profile is stale; initialize this copy first.")
+    receipt = read_json(inside(root, receipt_path, must_exist=True))
+    key, choice = receipt.get("skill"), receipt.get("choice")
+    if key not in profile.get("skill_setup", {}) or choice not in {"accepted", "declined", "deferred", "reconsider"}:
+        raise ValueError("Setup receipt needs skill ars/tikz and choice accepted/declined/deferred/reconsider.")
+    if not receipt.get("checked_at") or not receipt.get("user_instruction"):
+        raise ValueError("Setup decisions need checked_at and the actual user_instruction.")
+    receipt["evidence_hashes"] = evidence(root, receipt.get("evidence"))
+    profile["skill_setup"][key]["decision"] = receipt
+    write_json(root, path, profile)
+    return {"recorded": key, "choice": choice, "scope": "Records user choice only; no installation or update performed."}
 def now():
     return dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
 
@@ -533,11 +618,13 @@ def audit(root, args):
         if unchanged:
             for n in packages:
                 packages[n]["capability"] = old_packages[n].get("capability", "not_performed")
+    profile["skill_setup"] = skill_setup(root, profile, previous, bindings.get("skill_discovery"))
     write_json(root, "config/host.local.json", profile)
     return {
         "profile": "config/host.local.json",
         "python": selected_python, "resource_policy": policy,
         "python_packages": {n: {"version": p["version"], "check": p["capability"]} for n, p in packages.items()},
+        "skill_setup": profile["skill_setup"],
         "extensions_found": len(extensions), "warnings": profile["warnings"], "pending": profile["pending"],
         "scope": "Local inventory plus requested bounded Python checks; other capability/release checks require evidence.",
     }
@@ -554,7 +641,7 @@ def main(argv=None):
     init.add_argument("--skill-root", action="append", default=[])
     init.add_argument("--plugin-root", action="append", default=[])
     commands.add_parser("status")
-    for command in ("record-check", "record-release"):
+    for command in ("record-check", "record-release", "record-setup"):
         sub = commands.add_parser(command)
         sub.add_argument("receipt")
     args = parser.parse_args(argv)
@@ -564,6 +651,8 @@ def main(argv=None):
             raise ValueError("Not an initialized scaffold layout: config/project.json is missing.")
         if args.command == "audit":
             result = audit(root, args)
+        elif args.command == "record-setup":
+            result = record_setup(root, args.receipt)
         elif args.command == "status":
             result = state(root)
         else:

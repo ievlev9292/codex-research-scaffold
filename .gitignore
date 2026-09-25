@@ -15,3 +15,5 @@ __pycache__/
 !/catalog/extracted/.gitkeep
 # Interrupted atomic-save recovery files
 **/.atomic-*.stage
+
+research/runs/.lifecycle.lock
